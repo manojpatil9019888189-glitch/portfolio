@@ -11,7 +11,7 @@ function normalizeBase(raw: string | undefined): string {
 
 function pickEnv(env: Record<string, string>, key: string): string {
   const v = env[key] ?? process.env[key];
-  return typeof v === "string" ? v : "";
+  return typeof v === "string" ? v.trim() : "";
 }
 
 export default defineConfig(({ mode }) => {

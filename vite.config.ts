@@ -25,7 +25,10 @@ export default defineConfig(({ mode }) => {
   const VITE_EMAILJS_SERVICE_ID = pickEnv(env, "VITE_EMAILJS_SERVICE_ID");
   const VITE_EMAILJS_TEMPLATE_ID = pickEnv(env, "VITE_EMAILJS_TEMPLATE_ID");
 
-  const hasWeb3 = Boolean(VITE_WEB3FORMS_ACCESS_KEY.trim());
+  const hasWeb3Client = Boolean(VITE_WEB3FORMS_ACCESS_KEY.trim());
+  const hasServerWeb3 = Boolean(pickEnv(env, "WEB3FORMS_ACCESS_KEY").trim());
+  const hasResend =
+    Boolean(pickEnv(env, "RESEND_API_KEY").trim()) && Boolean(pickEnv(env, "MAIL_TO").trim());
   const hasEmailJS =
     Boolean(VITE_EMAILJS_PUBLIC_KEY.trim()) &&
     Boolean(VITE_EMAILJS_SERVICE_ID.trim()) &&
@@ -33,11 +36,11 @@ export default defineConfig(({ mode }) => {
 
   if (mode === "production") {
     console.log(
-      `[vite] Contact form: Web3Forms=${hasWeb3 ? "on" : "off"}, EmailJS=${hasEmailJS ? "on" : "off"}`,
+      `[vite] Contact: server API uses WEB3FORMS_ACCESS_KEY=${hasServerWeb3 ? "on" : "off"}, RESEND=${hasResend ? "on" : "off"}; client bundle Web3Forms=${hasWeb3Client ? "on" : "off"}, EmailJS=${hasEmailJS ? "on" : "off"}`,
     );
-    if (!hasWeb3 && !hasEmailJS) {
+    if (!hasServerWeb3 && !hasResend && !hasWeb3Client && !hasEmailJS) {
       console.warn(
-        "[vite] No contact keys at build. In Vercel: Settings → Environment Variables → add VITE_WEB3FORMS_ACCESS_KEY *or* all three VITE_EMAILJS_* keys. Enable for Production and Preview, then Redeploy (without cache if needed).",
+        "[vite] Add WEB3FORMS_ACCESS_KEY (recommended for /api/contact on Vercel) or RESEND_API_KEY+MAIL_TO, or client VITE_* keys. Redeploy after changing env.",
       );
     }
   }

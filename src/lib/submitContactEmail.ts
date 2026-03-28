@@ -15,6 +15,14 @@ function envStr(v: unknown): string {
   return typeof v === "string" ? v.trim() : "";
 }
 
+/** Vercel functions are mounted at /api/* on the deployment root (not under Vite base). */
+function getApiContactUrl(): string {
+  if (typeof window !== "undefined") {
+    return `${window.location.origin}/api/contact`;
+  }
+  return "/api/contact";
+}
+
 async function submitViaWeb3Forms(payload: ContactPayload): Promise<SubmitInboxResult> {
   const accessKey = envStr(import.meta.env.VITE_WEB3FORMS_ACCESS_KEY);
   if (!accessKey) {
@@ -59,7 +67,7 @@ async function submitViaWeb3Forms(payload: ContactPayload): Promise<SubmitInboxR
       return {
         success: false,
         error: blocked
-          ? "This site URL may need approval for the email form (common on free hosting). Please contact the site owner or use LinkedIn or email."
+          ? "Could not send from this browser. Please try again later or use LinkedIn or email."
           : (data.message ?? "Something went wrong. Please try again later."),
       };
     }
@@ -116,11 +124,8 @@ function isWeb3FormsConfigured(): boolean {
   return Boolean(envStr(import.meta.env.VITE_WEB3FORMS_ACCESS_KEY));
 }
 
-/**
- * Sends contact/feedback to your inbox.
- * Prefer Web3Forms when configured. If that fails and EmailJS flags are set, tries EmailJS (helps when Web3Forms blocks *.vercel.app until the domain is approved).
- */
-export async function submitToInbox(payload: ContactPayload): Promise<SubmitInboxResult> {
+/** Browser-only path (localhost + fallback when server API is unavailable). */
+async function submitViaClient(payload: ContactPayload): Promise<SubmitInboxResult> {
   if (isWeb3FormsConfigured()) {
     const primary = await submitViaWeb3Forms(payload);
     if (primary.success) return primary;
@@ -135,11 +140,50 @@ export async function submitToInbox(payload: ContactPayload): Promise<SubmitInbo
     return submitViaEmailJS(payload);
   }
 
-  console.warn(
-    "[contact] No VITE_WEB3FORMS_ACCESS_KEY or full EmailJS trio at build time. Vercel: Environment Variables → redeploy.",
-  );
   return {
     success: false,
     error: "This form is not available right now. Please reach out via LinkedIn or email.",
   };
+}
+
+async function parseApiJson(res: Response): Promise<{ success?: boolean; message?: string }> {
+  try {
+    return (await res.json()) as { success?: boolean; message?: string };
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Production: POST /api/contact (Web3Forms from server — avoids *.vercel.app browser blocks).
+ * Falls back to client Web3Forms/EmailJS if the API is missing or returns an error.
+ */
+export async function submitToInbox(payload: ContactPayload): Promise<SubmitInboxResult> {
+  if (import.meta.env.PROD) {
+    try {
+      const res = await fetch(getApiContactUrl(), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await parseApiJson(res);
+
+      if (res.ok && data.success) {
+        return { success: true };
+      }
+
+      const client = await submitViaClient(payload);
+      if (client.success) return client;
+
+      if (res.status === 400) {
+        return { success: false, error: data.message ?? "Please check the form fields." };
+      }
+      const errMsg = client.success === false ? client.error : "Could not send your message.";
+      return { success: false, error: errMsg };
+    } catch {
+      return submitViaClient(payload);
+    }
+  }
+
+  return submitViaClient(payload);
 }

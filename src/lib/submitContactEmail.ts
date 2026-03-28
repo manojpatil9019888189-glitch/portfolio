@@ -14,10 +14,12 @@ export type ContactPayload = {
 async function submitViaWeb3Forms(payload: ContactPayload): Promise<SubmitInboxResult> {
   const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
   if (!accessKey) {
+    console.warn(
+      "[contact] Set VITE_WEB3FORMS_ACCESS_KEY or full EmailJS VITE_* vars (Vercel: Project → Environment Variables).",
+    );
     return {
       success: false,
-      error:
-        "Email is not configured. Add VITE_WEB3FORMS_ACCESS_KEY or EmailJS variables (see .env.example).",
+      error: "This form is not available right now. Please reach out via LinkedIn or email.",
     };
   }
 
@@ -51,9 +53,12 @@ async function submitViaEmailJS(payload: ContactPayload): Promise<SubmitInboxRes
   const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
 
   if (!publicKey || !serviceId || !templateId) {
+    console.warn(
+      "[contact] EmailJS incomplete: set VITE_EMAILJS_PUBLIC_KEY, VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID on the host (e.g. Vercel env).",
+    );
     return {
       success: false,
-      error: "EmailJS is not fully configured. Check VITE_EMAILJS_* in .env.example.",
+      error: "This form is not available right now. Please reach out via LinkedIn or email.",
     };
   }
 
@@ -98,9 +103,11 @@ export async function submitToInbox(payload: ContactPayload): Promise<SubmitInbo
     return submitViaWeb3Forms(payload);
   }
 
+  console.warn(
+    "[contact] No email keys in this build. Vercel: Project → Settings → Environment Variables → add VITE_WEB3FORMS_ACCESS_KEY or the three VITE_EMAILJS_* vars → Redeploy. Check deploy logs for [vite] Contact form: …",
+  );
   return {
     success: false,
-    error:
-      "Add EmailJS (VITE_EMAILJS_PUBLIC_KEY, SERVICE_ID, TEMPLATE_ID) for plain emails, or Web3Forms — see .env.example.",
+    error: "This form is not available right now. Please reach out via LinkedIn or email.",
   };
 }

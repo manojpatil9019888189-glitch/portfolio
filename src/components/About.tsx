@@ -1,5 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { getResumePdfHref, RESUME_DOWNLOAD_NAME } from "@/lib/resume";
 
 const About = () => {
   const ref = useRef(null);
@@ -96,13 +97,12 @@ const About = () => {
               ))}
             </motion.div>
 
-            {/* RESUME BUTTON */}
             <motion.a
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.6 }}
-              href="public\Manoj Patil.pdf"
-              download
+              href={getResumePdfHref()}
+              download={RESUME_DOWNLOAD_NAME}
               className="inline-flex items-center gap-2 mt-10 px-8 py-4 rounded-full border border-border text-foreground font-medium hover:border-primary hover:text-primary transition-colors duration-300"
             >
               Download Resume

@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
+import { getResumePdfHref, RESUME_DOWNLOAD_NAME } from "@/lib/resume";
 
 const Hero = () => {
   return (
@@ -98,10 +99,9 @@ const Hero = () => {
               Get in Touch
             </a>
 
-            {/* ✅ DOWNLOAD RESUME BUTTON */}
             <a
-              href="/Manoj-Patil.pdf"
-              download="Manoj_Patil_Resume.pdf"
+              href={getResumePdfHref()}
+              download={RESUME_DOWNLOAD_NAME}
               className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-secondary text-foreground font-medium hover:opacity-90 transition-all duration-300"
             >
               Download Resume

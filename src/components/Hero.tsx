@@ -28,21 +28,15 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="relative mb-6 inline-block"
           >
-            <div
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-wider mb-6 relative z-10 text-gradient"
-            >
+            <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-wider mb-6 relative z-10 text-gradient">
               Manoj Patil
             </div>
-            {/* Animated underline */}
+
             <div className="absolute bottom-0 left-0 w-full h-1 overflow-hidden">
               <motion.div
                 className="h-full bg-gradient-to-r from-transparent via-primary to-transparent"
-                style={{
-                  width: "40%",
-                }}
-                animate={{
-                  x: ["-100%", "300%"],
-                }}
+                style={{ width: "40%" }}
+                animate={{ x: ["-100%", "300%"] }}
                 transition={{
                   duration: 2,
                   repeat: Infinity,
@@ -52,6 +46,7 @@ const Hero = () => {
               />
             </div>
           </motion.div>
+
           <motion.h1
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
@@ -78,9 +73,10 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.7 }}
             className="text-lg md:text-xl text-muted-foreground max-w-3xl mb-12"
           >
-            Entry-level DevOps / Cloud Engineer with hands-on experience in AWS, CI/CD automation, Docker, Kubernetes, and Terraform. Actively building real-world DevOps projects and seeking internship or full-time opportunities in DevOps, Cloud Engineering, or SRE.
+            Entry-level DevOps / Cloud Engineer with hands-on experience in AWS, CI/CD automation, Docker, Kubernetes, and Terraform.
           </motion.p>
 
+          {/* ✅ BUTTONS SECTION */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -94,11 +90,21 @@ const Hero = () => {
               View My Projects
               <ArrowDown className="w-4 h-4" />
             </a>
+
             <a
               href="#contact"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-border text-foreground font-medium hover:border-primary hover:text-primary transition-colors duration-300"
             >
               Get in Touch
+            </a>
+
+            {/* ✅ DOWNLOAD RESUME BUTTON */}
+            <a
+              href="/Manoj-Patil.pdf"
+              download="Manoj_Patil_Resume.pdf"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-secondary text-foreground font-medium hover:opacity-90 transition-all duration-300"
+            >
+              Download Resume
             </a>
           </motion.div>
         </div>
@@ -124,22 +130,6 @@ const Hero = () => {
           ))}
         </motion.div>
       </div>
-
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1.5 }}
-        className="absolute bottom-12 left-1/2 -translate-x-1/2"
-      >
-        <div className="w-6 h-10 rounded-full border-2 border-muted-foreground/30 flex justify-center pt-2">
-          <motion.div
-            animate={{ y: [0, 12, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="w-1 h-3 bg-primary rounded-full"
-          />
-        </div>
-      </motion.div>
     </section>
   );
 };
